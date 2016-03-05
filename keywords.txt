@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map For Bridge
+#######################################
+
+#######################################
+# Class (KEYWORD1)
+#######################################
+
+CoreSensors	KEYWORD1
+CoreSensor	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+# method names
+process	KEYWORD2
+getTemperature	KEYWORD2
+getVoltage	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
