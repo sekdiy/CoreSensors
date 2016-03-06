@@ -17,8 +17,8 @@ SensorCalibration duemilanoveTemperatureDefault = { 1.1786564159f, 321.95f, 1000
 // uncalibrated 0°C: 321,95K/273,15K = 1,1786564159
 // calibrated 0°C: -0,8°C +/- 0.3K
 SensorCalibration proMiniTemperatureDefault = { 1.22, 338.0f, 1000 };                   // Pro Mini 3,3V@5V
-// uncalibrated 0°C: 8,18°C -> 331.18°C?
-// calibrated 0°C:
+// uncalibrated 0°C: 8,18°C -> 331.18K
+// offset’ = deciCelsius * gain / 10 + offset – gain * T (see: http://www.avdweb.nl/arduino/hardware-interfacing/temperature-measurement.html#h10-calibration)
 SensorCalibration duemilanoveVoltageDefault = { 1.0261748959f, 0.0f, 1000 };            // Duemilanove
 SensorCalibration proMiniVoltageDefault = { 1.0192115269f, 0.0f, 1000 };                // Pro Mini 3,3V@5V
 
@@ -67,7 +67,7 @@ bool CoreSensors::processTemperature()
     sei();
 
     // wait for the reference to stabilize
-    delay(2);
+    delay(20);  // TODO determine optimal value
 
     // store temperature
     this->temperature = (float) ((this->accumulate(this->caliT.duration) / float(this->caliT.duration) - this->caliT.offset) / this->caliT.gain);
@@ -90,6 +90,13 @@ bool CoreSensors::processVoltage()
 
     // save old mux setting
     byte mux = ADMUX;
+
+//   // use the 1.1 V internal reference
+// #if defined(__AVR_ATmega2560__)
+//    analogReference(INTERNAL1V1);
+// #else
+//    analogReference(INTERNAL);
+// #endif
 
     // select internal band gap reference
 #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
@@ -178,9 +185,9 @@ inline unsigned int CoreSensors::sample()
 
     // bring ADC clock between 50kHz and 200kHz (as per AVR documentation)
 #if (F_CPU >= 6400000) && (F_CPU <= 25600000)
-    ADCSRA |= _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0); // above 16MHz: divide it by 128
+    ADCSRA |= _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0); // above 6.4MHz: divide it by 128
 #elif F_CPU >= 3200000
-    ADCSRA |= _BV(ADPS2) | _BV(ADPS1);              // above 6MHz:  divide it by 64
+    ADCSRA |= _BV(ADPS2) | _BV(ADPS1);              // above 3.2MHz:  divide it by 64
 #elif F_CPU >= 1600000
     ADCSRA |= _BV(ADPS2) | _BV(ADPS0);              // above 1.6MHz:  divide it by 32
 #elif F_CPU >= 800000
@@ -197,7 +204,7 @@ inline unsigned int CoreSensors::sample()
 
     // set up and enable sleep mode
     sleep_enable();                                 // enable sleep capability via avr sleep library
-    set_sleep_mode(SLEEP_MODE_ADC);                 // aenble ADC noise reduction sleep mode
+    set_sleep_mode(SLEEP_MODE_ADC);                 // enable ADC noise reduction sleep mode
     sei();                                          // enable interrupts
     sleep_cpu();                                    // enter low ADC noise sleep mode
 

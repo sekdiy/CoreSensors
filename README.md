@@ -39,7 +39,7 @@ void loop()
 
 This example takes a measurement, displays the core temperature (both in °C and in °F) as well as the core voltage and then repeats.
 
-You can also separate the two concerns, either only dealing with one or the other:
+You can also separate the two concerns, only dealing with either one or the other:
 
 ```c++
 // schedule a new measurement
