@@ -4,7 +4,7 @@
  * An interface to the Arduino's internal temperature (diode reference) and supply voltage (bandgap reference).
  *
  * @author sekdiy (https://github.com/sekdiy/CoreSensors)
- * @date 05.03.2016
+ * @date 08.03.2016
  * @version See git comments for changes.
  * @see http://playground.arduino.cc/Main/InternalTemperatureSensor
  */
@@ -13,12 +13,12 @@
 #define CoreSensors_H
 
 /**
- * The SensorCalibration structure stores calibration information for temperature and voltage compensation.
+ * The CoreSensorsCalibration structure stores calibration information for temperature and voltage compensation.
  *
  * Arduino Pro Mini:    { 1.22f, 64.85f, 1000, 1.0192115269f, 0.0f, 1000 }
  * Arduino Duemilanove: { 1.1786564159f, 48.8f, 1000, 1.0261748959f, 0.0f, 1000 }
  *
- * @see http://goo.gl/Sqmzfs
+ * @see e.g. http://goo.gl/Sqmzfs
  * @todo create tutorial on calibration
  */
 typedef struct
@@ -45,14 +45,13 @@ public:
   void begin(CoreSensorsCalibration calibration);
 
   bool process();
+  bool processTemperature();
+  bool processVoltage();
 
   float getTemperature(bool fahrenheit = false);
   float getVoltage();
 
 private:
-  bool processTemperature();
-  bool processVoltage();
-
   unsigned long accumulate(unsigned long duration);
   inline unsigned int sample();
 

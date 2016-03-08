@@ -4,14 +4,13 @@
  * An interface to the Arduino's internal temperature (diode reference) and supply voltage (bandgap reference).
  *
  * @author sekdiy (https://github.com/sekdiy/CoreSensors)
- * @date 05.03.2016
+ * @date 08.03.2016
  * @version See git comments for changes.
  * @see http://playground.arduino.cc/Main/InternalTemperatureSensor
  *
- * @todo check for consistent interrupt and register preservation
- * @todo add cross-compensation after calibration (temperature-compensated voltage, voltage-compensated temperature)
- * @todo find more sensor functionality to include in library :)
- * @todo maybe refactor to Millivolt and Millikelvin in order to get rid of floating point arithmetic
+ * @todo handle proper voltage sensing in MCUs without temperature sensor
+ * @todo consider refactoring to Millivolt and Millikelvin in order to get rid of floating point arithmetic
+ * @todo find more sensor functionality to include in library
  */
 
 #include <avr/sleep.h>      // built-in AVR sleep library
@@ -19,16 +18,14 @@
 #include "CoreSensors.h"    // https://github.com/sekdiy/CoreSensors
 
 /**
- * Default constructor, sets calibration data for both temperature and voltage correction.
- *
- * @param SensorCalibration The calibration data for the MCU at hand. Optional, defaults to 'uncalibrated'.
+ * Constructor (defaults to uncalibrated).
  */
 CoreSensors::CoreSensors() : calibration({ 1.0f, 0.0f, 1, 1.0f, 0.0f, 1 }) {};
 
 /**
  * Applies a custom set of calibration parameters.
  *
- * @param SensorCalibration The calibration data for the MCU at hand.
+ * @param CoreSensorsCalibration The calibration data for the MCU at hand.
  */
 void CoreSensors::begin(CoreSensorsCalibration calibration)
 {
@@ -151,8 +148,6 @@ bool CoreSensors::processVoltage()
 }
 
 /*
- * Returns the core temperature in degrees Celsius or Fahrenheit.
- *
  * @param bool True for degrees Fahrenheit, Celsius otherwise.
  * @return The temperature (in degrees Celsius or Fahrenheit).
  */
@@ -162,8 +157,6 @@ float CoreSensors::getTemperature(bool fahrenheit)
 }
 
 /*
- * Returns the core voltage (in Volts).
- *
  * @return The voltage (in Volt).
  */
 float CoreSensors::getVoltage()
@@ -177,14 +170,14 @@ float CoreSensors::getVoltage()
  * @param The number of samples to be aquired.
  * @return The linear sum of all sampled values.
  */
-unsigned long CoreSensors::accumulate(unsigned long count)
+unsigned long CoreSensors::accumulate(unsigned long length)
 {
-    long acc = 0;         // accumulator
+    unsigned long acc = 0;  // accumulator
 
-    this->sample();       // discard first sample (never hurts to be safe)
+    this->sample();         // discard first sample (never hurts to be safe)
 
     // accumulate a series of samples
-    for (int i = 0; i < count; i++) {
+    for (unsigned long i = 0; i < length; i++) {
         acc += this->sample();
     }
 
@@ -249,7 +242,7 @@ ISR(ADC_vect)
 }
 
 /**
- * The CoreSensor object, a singleton that gives access to the core sensors.
+ * The CoreSensor object, a singleton that gives access to the core sensors (there is only one AVR core!).
  */
 CoreSensors CoreSensor;
 
