@@ -7,36 +7,56 @@
  * @date 05.03.2016
  * @version See git comments for changes.
  * @see http://playground.arduino.cc/Main/InternalTemperatureSensor
+ *
+ * @todo check for consistent interrupt and register preservation
+ * @todo add cross-compensation after calibration (temperature-compensated voltage, voltage-compensated temperature)
+ * @todo find more sensor functionality to include in library :)
+ * @todo maybe refactor to Millivolt and Millikelvin in order to get rid of floating point arithmetic
  */
 
 #include <avr/sleep.h>      // built-in AVR sleep library
-#include "Arduino.h"        // we're no longer compatible to IDEs < 1.0
+#include "Arduino.h"        // we're no longer compatible to IDEs < 1.0 (please raise an issue if this is too progressive)
 #include "CoreSensors.h"    // https://github.com/sekdiy/CoreSensors
-
-SensorCalibration duemilanoveTemperatureDefault = { 1.1786564159f, 321.95f, 1000 };     // 328P, see: http://www.netquote.it/nqmain/arduino-nano-v3-internal-temperature-sensor/
-// uncalibrated 0°C: 321,95K/273,15K = 1,1786564159
-// calibrated 0°C: -0,8°C +/- 0.3K
-SensorCalibration proMiniTemperatureDefault = { 1.22, 338.0f, 1000 };                   // Pro Mini 3,3V@5V
-// uncalibrated 0°C: 8,18°C -> 331.18K
-// offset’ = deciCelsius * gain / 10 + offset – gain * T (see: http://www.avdweb.nl/arduino/hardware-interfacing/temperature-measurement.html#h10-calibration)
-SensorCalibration duemilanoveVoltageDefault = { 1.0261748959f, 0.0f, 1000 };            // Duemilanove
-SensorCalibration proMiniVoltageDefault = { 1.0192115269f, 0.0f, 1000 };                // Pro Mini 3,3V@5V
 
 /**
  * Default constructor, sets calibration data for both temperature and voltage correction.
+ *
+ * @param SensorCalibration The calibration data for the MCU at hand. Optional, defaults to 'uncalibrated'.
  */
-CoreSensors::CoreSensors(SensorCalibration temperatureCalibration, SensorCalibration voltageCalibration) : caliT(temperatureCalibration), caliV(voltageCalibration) {};
+CoreSensors::CoreSensors() : calibration({ 1.0f, 0.0f, 1, 1.0f, 0.0f, 1 }) {};
+
+/**
+ * Applies a custom set of calibration parameters.
+ *
+ * @param SensorCalibration The calibration data for the MCU at hand.
+ */
+void CoreSensors::begin(CoreSensorsCalibration calibration)
+{
+    this->calibration = calibration;
+}
 
 /**
  * Process both temperature and voltage measurements and store results.
+ *
+ * @return True if either sensor could be processed successfully.
  */
 bool CoreSensors::process()
 {
-    return (this->processTemperature() && this->processVoltage());
+    // assume successful processing
+    bool result = true;
+
+    // make sure both sensors get processed
+    result &= this->processTemperature();
+    result &= this->processVoltage();
+
+    // fail if either sensor fails
+    return result;
 }
 
 /**
  * Process temperature measurement and store result.
+ *
+ * @return True if temperature sensor could be processed successfully.
  */
 bool CoreSensors::processTemperature()
 {
@@ -59,7 +79,7 @@ bool CoreSensors::processTemperature()
     // ATmega168 : No
     // ATmega1280 (Arduino Mega) : No
     // ATmega2560 (Arduino Mega 2560) : No
-    // please contact me if you know the specifics of other MCUs
+    // please raise an issue if you know the specifics of other MCUs
     #error unsupported MCU
 #endif
 
@@ -70,17 +90,19 @@ bool CoreSensors::processTemperature()
     delay(20);  // TODO determine optimal value
 
     // store temperature
-    this->temperature = (float) ((this->accumulate(this->caliT.duration) / float(this->caliT.duration) - this->caliT.offset) / this->caliT.gain);
+    this->temperature = (float) ((this->accumulate(this->calibration.lengthT) / float(this->calibration.lengthT) - 273.15f - this->calibration.offsetT) / this->calibration.gainT);
 
     // restore old mux setting
     ADMUX = mux;
 
-    // check if temperature is valid
-    return (-100 < this->temperature);
+    // check if temperature is plausible (datasheet specifies -40degC – 85degC after calibration)
+    return (-40 < this->temperature) && (85 > this->temperature);
 }
 
 /**
  * Process voltage measurement and store result.
+ *
+ * @return True if voltage sensor could be processed successfully.
  */
 
 bool CoreSensors::processVoltage()
@@ -90,13 +112,6 @@ bool CoreSensors::processVoltage()
 
     // save old mux setting
     byte mux = ADMUX;
-
-//   // use the 1.1 V internal reference
-// #if defined(__AVR_ATmega2560__)
-//    analogReference(INTERNAL1V1);
-// #else
-//    analogReference(INTERNAL);
-// #endif
 
     // select internal band gap reference
 #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
@@ -108,14 +123,14 @@ bool CoreSensors::processVoltage()
     // ATmega 168:  Arduino Decimilia and older
     // ATmega 328P: Arduino Duemilanove, Uno and compatible
     ADMUX =  _BV(REFS0) | _BV(MUX3) | _BV(MUX2) |_BV (MUX1);
-#elif defined (__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+#elif defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
     // ATTinyX5: various types
     ADMUX = _BV(MUX3) | _BV(MUX2);
-#elif defined (__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+#elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
     // ATTinyX4: various types
     ADMUX =  _BV(MUX5) | _BV(MUX0);
 #else
-    // please contact me if you know the specifics of other MCUs
+    // please raise an issue if you know the specifics of other MCUs
     #error unsupported MCU
 #endif
 
@@ -126,20 +141,31 @@ bool CoreSensors::processVoltage()
     delay(70);  // see atmel.com/Images/doc8444.pdf on page 9
 
     // store voltage: ADC = (Vref * 1024) / Vcc <=> Vcc = (Vref * 1024) / ADC
-    this->voltage = (float) (((1.1f - this->caliV.offset) * 1024.0f / this->caliV.gain) / (this->accumulate(this->caliV.duration) / float(this->caliV.duration)));
+    this->voltage = (float) (((1.1f - this->calibration.offsetV) * 1024.0f / this->calibration.gainV) / (this->accumulate(this->calibration.lengthV) / float(this->calibration.lengthV)));
 
     // restore old mux setting
     ADMUX = mux;
 
-    // check if voltage is positive
-    return (0 < this->voltage);
+    // check if voltage is plausible (datasheet specifies 1.8 – 5.5V)
+    return (1.8 < this->voltage) && (5.5 > this->voltage);
 }
 
+/*
+ * Returns the core temperature in degrees Celsius or Fahrenheit.
+ *
+ * @param bool True for degrees Fahrenheit, Celsius otherwise.
+ * @return The temperature (in degrees Celsius or Fahrenheit).
+ */
 float CoreSensors::getTemperature(bool fahrenheit)
 {
     return (float) (fahrenheit ? this->temperature * 1.8f + 32.0f : this->temperature);
 }
 
+/*
+ * Returns the core voltage (in Volts).
+ *
+ * @return The voltage (in Volt).
+ */
 float CoreSensors::getVoltage()
 {
     return (float) this->voltage;
@@ -147,15 +173,18 @@ float CoreSensors::getVoltage()
 
 /**
  * Collects a series (of given length) of measurements and returns the linear sum of all results.
+ *
+ * @param The number of samples to be aquired.
+ * @return The linear sum of all sampled values.
  */
-unsigned long CoreSensors::accumulate(unsigned long duration)
+unsigned long CoreSensors::accumulate(unsigned long count)
 {
     long acc = 0;         // accumulator
 
     this->sample();       // discard first sample (never hurts to be safe)
 
     // accumulate a series of samples
-    for (int i = 0; i < duration; i++) {
+    for (int i = 0; i < count; i++) {
         acc += this->sample();
     }
 
@@ -165,20 +194,13 @@ unsigned long CoreSensors::accumulate(unsigned long duration)
 
 /**
  * Puts the MCU into ADC noise reduction sleep mode (until the measurement is complete) and returns the sampled value.
+ *
+ * @return The single sample value.
  */
 inline unsigned int CoreSensors::sample()
 {
     // save old ADC settings
     byte sra = ADCSRA;                              // store whole ADC settings register A
-
-//    // set it up
-//     ADCSRA |= _BV(ADEN) | _BV(ADSC);     // enable ADC, start conversion
-//
-//     // wait for it
-//     while (bit_is_set(ADCSRA, ADSC));    // while conversion is running
-//
-//     // get the result
-//     return ADCL | (ADCH << 8);           // combined conversion value (instead of ADCW)
 
     // set up ADC register
     ADCSRA |= _BV(ADEN) | _BV(ADIE);                // enable ADC, enable interrupt on finished conversion
@@ -199,6 +221,7 @@ inline unsigned int CoreSensors::sample()
 #elif F_CPU >= 100000
     ADCSRA |= _BV(ADPS0);                           // above 0.2MHz:  divide it by 2
 #else
+    // please raise an issue if you find unsupported configurations
     #error clock speed not supported
 #endif
 
@@ -216,12 +239,17 @@ inline unsigned int CoreSensors::sample()
 
 /**
  * We're using ADC noise reduction sleep mode above.
- * Since this capability is based on interrupts, we need an interrupt handler.
+ * Since this capability is based on interrupts, we need an interrupt handler (in order to ever wake up again).
  * But since there is no actual functionality to be handled, this handler remains empty.
+ *
+ * This ADC_vect can be replaced by a different one without breaking the CoreSensors library.
  */
 ISR(ADC_vect)
 {
 }
 
+/**
+ * The CoreSensor object, a singleton that gives access to the core sensors.
+ */
 CoreSensors CoreSensor;
 

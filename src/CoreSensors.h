@@ -12,42 +12,59 @@
 #ifndef CoreSensors_H
 #define CoreSensors_H
 
+/**
+ * The SensorCalibration structure stores calibration information for temperature and voltage compensation.
+ *
+ * Arduino Pro Mini:    { 1.22f, 64.85f, 1000, 1.0192115269f, 0.0f, 1000 }
+ * Arduino Duemilanove: { 1.1786564159f, 48.8f, 1000, 1.0261748959f, 0.0f, 1000 }
+ *
+ * @see http://goo.gl/Sqmzfs
+ * @todo create tutorial on calibration
+ */
 typedef struct
 {
-  float gain;
-  float offset;
-  long duration;
-} SensorCalibration;
+  // temperature
+  float gainT;          // over intended range
+  float offsetT;        // at 0 degree Celsius
+  long  lengthT;        // number of samples for averaging
 
-extern SensorCalibration proMiniTemperatureDefault;
-extern SensorCalibration proMiniVoltageDefault;
+  // voltage
+  float gainV;          // over intended range
+  float offsetV;        // at nominal supply voltage
+  long  lengthV;        // number of samples for averaging
+} CoreSensorsCalibration;
 
-extern SensorCalibration duemilanoveTemperatureDefault;
-extern SensorCalibration duemilanoveVoltageDefault;
-
+/**
+ * The CoreSensors class.
+ */
 class CoreSensors
 {
 public:
-  CoreSensors(SensorCalibration temperatureCalibration = proMiniTemperatureDefault, SensorCalibration voltageCalibration = proMiniVoltageDefault);
+  CoreSensors();
+
+  void begin(CoreSensorsCalibration calibration);
 
   bool process();
-  bool processTemperature();
-  bool processVoltage();
 
   float getTemperature(bool fahrenheit = false);
   float getVoltage();
 
 private:
+  bool processTemperature();
+  bool processVoltage();
+
   unsigned long accumulate(unsigned long duration);
   inline unsigned int sample();
 
   float temperature;
   float voltage;
 
-  SensorCalibration caliT;
-  SensorCalibration caliV;
+  CoreSensorsCalibration calibration;
 };
 
+/**
+ * The CoreSensor object, a singleton that gives access to the core sensors (there is only one AVR core!).
+ */
 extern CoreSensors CoreSensor;
 
 #endif
