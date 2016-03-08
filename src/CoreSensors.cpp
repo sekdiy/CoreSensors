@@ -57,40 +57,41 @@ bool CoreSensors::process()
  */
 bool CoreSensors::processTemperature()
 {
-    // disable interrupts
-    cli();
+    // determine specific ADMUX settings
+#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega168A__) ||  defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) ||  defined(__AVR_ATmega328P__)
+    // ATmega 32U4: Arduino Leonardo and compatible
+    // ATmega 168A/P:  Arduino Decimilia and older
+    // ATmega 328(P): Arduino Duemilanove, Uno and compatible
+    #define CoreSensors_Temperature_ADMUX bit(REFS1) | bit(REFS0) |  bit(MUX3)
+#else
+    // ATmega8: No
+    // ATmega8L: No
+    // ATmega8A: No
+    // ATmega168: No
+    // ATmega1280 (Arduino Mega): No
+    // ATmega2560 (Arduino Mega 2560): No
+    // please raise an issue if you know the specifics of other MCUs
+    return false;
+#endif
 
     // save old mux setting
     byte mux = ADMUX;
 
     // select internal temperature sensor
-#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega168A__) ||  defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) ||  defined(__AVR_ATmega328P__)
-    // ATmega 32U4: Arduino Leonardo and compatible
-    // ATmega 168A/P:  Arduino Decimilia and older
-    // ATmega 328(P): Arduino Duemilanove, Uno and compatible
-    ADMUX = bit(REFS1) | bit(REFS0) |  bit(MUX3);
-#else
-    // ATmega8 : No
-    // ATmega8L : No
-    // ATmega8A : No
-    // ATmega168 : No
-    // ATmega1280 (Arduino Mega) : No
-    // ATmega2560 (Arduino Mega 2560) : No
-    // please raise an issue if you know the specifics of other MCUs
-    #error unsupported MCU
-#endif
-
-    // enable interrupts
-    sei();
+    cli();                                  // disable interrupts
+    ADMUX = CoreSensors_Temperature_ADMUX;  // apply
+    sei();                                  // enable interrupts
 
     // wait for the reference to stabilize
-    delay(20);  // TODO determine optimal value
+    delay(20);                              // TODO determine optimal value
 
     // store temperature
     this->temperature = (float) ((this->accumulate(this->calibration.lengthT) / float(this->calibration.lengthT) - 273.15f - this->calibration.offsetT) / this->calibration.gainT);
 
     // restore old mux setting
-    ADMUX = mux;
+    cli();                                  // disable interrupts
+    ADMUX = mux;                            // restore
+    sei();                                  // enable interrupts
 
     // check if temperature is plausible (datasheet specifies -40degC – 85degC after calibration)
     return (-40 < this->temperature) && (85 > this->temperature);
@@ -104,35 +105,34 @@ bool CoreSensors::processTemperature()
 
 bool CoreSensors::processVoltage()
 {
-    // disable interrupts
-    cli();
+    // determine specific ADMUX settings
+#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+    // ATmega 32U4: Arduino Leonardo and compatible
+    // ATmega 1280: Arduino Mega and compatible
+    // ATmega 2560: Arduino Mega 2560 and compatible
+    #define CoreSensors_Voltage_ADMUX _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1)
+#elif defined(__AVR_ATmega168__) ||  defined(__AVR_ATmega328__) || defined(__AVR_ATmega168P__) ||  defined(__AVR_ATmega328P__)
+    // ATmega 168:  Arduino Decimilia and older
+    // ATmega 328P: Arduino Duemilanove, Uno and compatible
+    #define CoreSensors_Voltage_ADMUX _BV(REFS0) | _BV(MUX3) | _BV(MUX2) |_BV (MUX1);
+#elif defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+    // ATTinyX5: various types
+    #define CoreSensors_Voltage_ADMUX _BV(MUX3) | _BV(MUX2);
+#elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+    // ATTinyX4: various types
+    #define CoreSensors_Voltage_ADMUX _BV(MUX5) | _BV(MUX0);
+#else
+    // please raise an issue if you know the specifics of other MCUs
+    return false;
+#endif
 
     // save old mux setting
     byte mux = ADMUX;
 
     // select internal band gap reference
-#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-    // ATmega 32U4: Arduino Leonardo and compatible
-    // ATmega 1280: Arduino Mega and compatible
-    // ATmega 2560: Arduino Mega 2560 and compatible
-    ADMUX =  _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
-#elif defined(__AVR_ATmega168__) ||  defined(__AVR_ATmega328__) || defined(__AVR_ATmega168P__) ||  defined(__AVR_ATmega328P__)
-    // ATmega 168:  Arduino Decimilia and older
-    // ATmega 328P: Arduino Duemilanove, Uno and compatible
-    ADMUX =  _BV(REFS0) | _BV(MUX3) | _BV(MUX2) |_BV (MUX1);
-#elif defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-    // ATTinyX5: various types
-    ADMUX = _BV(MUX3) | _BV(MUX2);
-#elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-    // ATTinyX4: various types
-    ADMUX =  _BV(MUX5) | _BV(MUX0);
-#else
-    // please raise an issue if you know the specifics of other MCUs
-    #error unsupported MCU
-#endif
-
-    // enable interrupts
-    sei();
+    cli();                                  // disable interrupts
+    ADMUX = CoreSensors_Voltage_ADMUX;      // apply
+    sei();                                  // enable interrupts
 
     // wait for the reference to stabilize
     delay(70);  // see atmel.com/Images/doc8444.pdf on page 9
@@ -141,7 +141,9 @@ bool CoreSensors::processVoltage()
     this->voltage = (float) (((1.1f - this->calibration.offsetV) * 1024.0f / this->calibration.gainV) / (this->accumulate(this->calibration.lengthV) / float(this->calibration.lengthV)));
 
     // restore old mux setting
-    ADMUX = mux;
+    cli();                                  // disable interrupts
+    ADMUX = mux;                            // restore
+    sei();                                  // enable interrupts
 
     // check if voltage is plausible (datasheet specifies 1.8 – 5.5V)
     return (1.8 < this->voltage) && (5.5 > this->voltage);
@@ -192,6 +194,9 @@ unsigned long CoreSensors::accumulate(unsigned long length)
  */
 inline unsigned int CoreSensors::sample()
 {
+    // disable interrupts
+    cli();
+
     // save old ADC settings
     byte sra = ADCSRA;                              // store whole ADC settings register A
 
@@ -221,13 +226,16 @@ inline unsigned int CoreSensors::sample()
     // set up and enable sleep mode
     sleep_enable();                                 // enable sleep capability via avr sleep library
     set_sleep_mode(SLEEP_MODE_ADC);                 // enable ADC noise reduction sleep mode
-    sei();                                          // enable interrupts
+    sei();                                          // enable interrupts (very important)
     sleep_cpu();                                    // enter low ADC noise sleep mode
 
     // we're awake again
+    cli();                                          // disable interrupts
+    unsigned int result = ADC;                      // get conversion value directly from register
     ADCSRA = sra;                                   // restore saved ADC settings
+    sei();                                          // enable interrupts
 
-    return ADC;                                     // get conversion value directly from register
+    return result;
 }
 
 /**
