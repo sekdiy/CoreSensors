@@ -12,7 +12,7 @@ install:
 #  - arduino --install-library "Adafruit SleepyDog Library,Adafruit MQTT Library"
 script:
   - arduino --verify --board arduino:avr:uno $PWD/examples/CoreSensors-simple/CoreSensors-simple.ino
-  - arduino --verify --board arduino:avr:uno $PWD/examples/CoreSensors-scheduled/CoreSensors-scheduled.ino
+  - arduino --verify --board arduino:avr:uno $PWD/examples/CoreSensors-complex/CoreSensors-complex.ino
 notifications:
   email:
     on_success: change
