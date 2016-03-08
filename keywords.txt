@@ -6,6 +6,7 @@
 # Class (KEYWORD1)
 #######################################
 
+CoreSensorsCalibration  KEYWORD1
 CoreSensors	KEYWORD1
 CoreSensor	KEYWORD1
 

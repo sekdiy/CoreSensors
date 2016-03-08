@@ -40,20 +40,6 @@ void loop()
 
 This example takes a measurement, displays the core temperature (both in °C and in °F) as well as the core voltage and then repeats.
 
-You can also separate the two concerns, only dealing with either one or the other:
-
-```c++
-// schedule a new measurement
-CoreSensor.processVoltage();
-
-// get updated temperature value
-temperature = CoreSensor.getVoltage();
-```
-
-This snippet only updates the voltage measurement and then fetches the result.
-
-If you don't need both sensor values, it's quicker and less energy consuming to only aquire one.
-
 ## How
 
 **CoreSensors** employs two properties that are built into the Arduino:
@@ -66,4 +52,4 @@ The library is aware of different Arduino types, clock speeds and supply voltage
 
 Since the sensors aren't comparable with high precision external sensors, they can use some individual calibration in order to improve precision.
 
-The **CoreSensors** library comes with a set of calibration profiles for different MCU types. But you can easily calibrate each individual Arduino (by taking two reference measurements and applying a simple formula).
+The **CoreSensors** library provides you with a way to calibrate each individual Arduino (by taking two reference measurements and applying a simple formula, e.g. see [Albert van Dalen](http://goo.gl/Sqmzfs)).
