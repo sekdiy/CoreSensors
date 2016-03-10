@@ -15,7 +15,10 @@ CoreSensor	KEYWORD1
 #######################################
 
 # method names
+begin	KEYWORD2
 process	KEYWORD2
+processTemperature	KEYWORD2
+processVoltage	KEYWORD2
 getTemperature	KEYWORD2
 getVoltage	KEYWORD2
 
