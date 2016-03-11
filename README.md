@@ -54,4 +54,4 @@ The library is aware of different Arduino types, clock speeds and supply voltage
 
 Since the sensors aren't comparable with high precision external sensors, they can use some individual calibration in order to improve precision.
 
-The **CoreSensors** library provides you with a way to calibrate each individual Arduino (by taking two reference measurements and applying a simple formula, e.g. see [Albert van Dalen](http://goo.gl/Sqmzfs)).
+The **CoreSensors** library provides you with a way to calibrate each individual Arduino (by taking two reference measurements and applying a simple formula, e.g. see [Albert van Dalen](http://goo.gl/Sqmzfs) and [Oregon Embedded](http://oregonembedded.com/slopeoffset.html)).
