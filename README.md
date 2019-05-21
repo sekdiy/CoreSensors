@@ -1,4 +1,4 @@
-# CoreSensors Library [![Version](https://img.shields.io/badge/CoreSensors-0.1.1-blue.svg 'still in beta')](https://github.com/sekdiy/CoreSensors) [![Build Status](https://travis-ci.org/sekdiy/CoreSensors.svg?branch=master)](https://travis-ci.org/sekdiy/CoreSensors) [![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&dl=https%3A%2F%2Fgithub.com%2Fsekdiy%2FCoreSensors&cid=2238D739-76DE-4205-9768-2F3277FA2561&tid=UA-65656434-2&aip=1&dt=README)]()
+# CoreSensors Library [![Version](https://img.shields.io/badge/CoreSensors-0.2.0-blue.svg 'still in beta')](https://github.com/sekdiy/CoreSensors) [![Build Status](https://travis-ci.org/sekdiy/CoreSensors.svg?branch=master)](https://travis-ci.org/sekdiy/CoreSensors) [![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&dl=https%3A%2F%2Fgithub.com%2Fsekdiy%2FCoreSensors&cid=2238D739-76DE-4205-9768-2F3277FA2561&tid=UA-65656434-2&aip=1&dt=README)]()
 
 **CoreSensors** is an Arduino library that supports measuring the AVR's internal temperature and supply voltage.
 
