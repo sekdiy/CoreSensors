@@ -59,11 +59,17 @@ bool CoreSensors::process()
 bool CoreSensors::processTemperature()
 {
     // determine specific ADMUX settings
-#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega168A__) ||  defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) ||  defined(__AVR_ATmega328P__)
-    // ATmega 32U4: Arduino Leonardo and compatible
-    // ATmega 168A/P:  Arduino Decimilia and older
-    // ATmega 328(P): Arduino Duemilanove, Uno and compatible
+#if defined(__AVR_ATmega32U4__)
+    // ATmega 32U4: Arduino Leonardo, Pro Micro and compatible
+    #define CoreSensors_Temperature_ADMUX bit(REFS1) | bit(REFS0) |  bit(MUX2) |  bit(MUX1) |  bit(MUX0)
+    #define CoreSensors_Temperature_ADCSRB bit(MUX5)
+    #define CoreSensors_Temperature_Offset 0
+#elif defined(__AVR_ATmega168__) ||  defined(__AVR_ATmega328__) || defined(__AVR_ATmega168P__) ||  defined(__AVR_ATmega328P__)
+    // ATmega 168:  Arduino Decimilia and older
+    // ATmega 328P: Arduino Duemilanove, Uno and compatible
     #define CoreSensors_Temperature_ADMUX bit(REFS1) | bit(REFS0) |  bit(MUX3)
+    #define CoreSensors_Temperature_ADCSRB 0
+    #define CoreSensors_Temperature_Offset 50
 #else
     // ATmega8: No
     // ATmega8L: No
@@ -75,23 +81,25 @@ bool CoreSensors::processTemperature()
     return false;
 #endif
 
-    // save old mux setting
+    // save old mux and srb setting
     byte mux = ADMUX;
+    byte srb = ADCSRB;
 
     // select internal temperature sensor
     cli();                                  // disable interrupts
     ADMUX = CoreSensors_Temperature_ADMUX;  // apply
+    ADCSRB = CoreSensors_Temperature_ADCSRB;
     sei();                                  // enable interrupts
 
-    // wait for the reference to stabilize
-    delay(20);                              // TODO determine optimal value
+    delay(20);                              // wait for the reference to stabilize
 
-    // store temperature
-    this->temperature = (float) ((this->accumulate(this->calibration.lengthT) / float(this->calibration.lengthT) - 273.15f - this->calibration.offsetT) / this->calibration.gainT);
+    // sample, average, calculate and store compensated temperature
+    this->temperature = (float) ((this->accumulate(this->calibration.lengthT) / float(this->calibration.lengthT) - 273.15f - CoreSensors_Temperature_Offset - this->calibration.offsetT) / (1.22f * this->calibration.gainT));
 
-    // restore old mux setting
+    // restore old mux and srb setting
     cli();                                  // disable interrupts
     ADMUX = mux;                            // restore
+    ADCSRB = srb;
     sei();                                  // enable interrupts
 
     // check if temperature is plausible (datasheet specifies -40degC – 85degC after calibration)
