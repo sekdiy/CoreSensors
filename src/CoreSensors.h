@@ -18,7 +18,7 @@
  * Arduino Pro Mini:    { 1.22f, 64.85f, 1000, 1.0192115269f, 0.0f, 1000 }
  * Arduino Duemilanove: { 1.1786564159f, 48.8f, 1000, 1.0261748959f, 0.0f, 1000 }
  *
- * @see e.g. http://goo.gl/Sqmzfs
+ * @see e.g. https://www.avdweb.nl/arduino/measurement/temperature-measurement#h10-calibration
  * @todo create tutorial on calibration
  */
 typedef struct

@@ -8,9 +8,7 @@
  * @version See git comments for changes.
  * @see http://playground.arduino.cc/Main/InternalTemperatureSensor
  *
- * @todo handle proper voltage sensing in MCUs without temperature sensor
  * @todo consider refactoring to Millivolt and Millikelvin in order to get rid of floating point arithmetic
- * @todo find more sensor functionality to include in library
  */
 
 #include <avr/sleep.h>      // built-in AVR sleep library
@@ -105,7 +103,6 @@ bool CoreSensors::processTemperature()
  *
  * @return True if voltage sensor could be processed successfully.
  */
-
 bool CoreSensors::processVoltage()
 {
     // determine specific ADMUX settings
@@ -256,4 +253,3 @@ ISR(ADC_vect)
  * The CoreSensor object, a singleton that gives access to the core sensors (there is only one AVR core!).
  */
 CoreSensors CoreSensor;
-
