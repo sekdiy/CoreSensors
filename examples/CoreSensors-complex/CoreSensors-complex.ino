@@ -27,7 +27,7 @@ void loop()
     Serial.print(CoreSensor.getTemperature(), 4); Serial.print(" degC, ");            // print temperature in degree Celsius
     Serial.print(CoreSensor.getTemperature(true), 4); Serial.print(" degF ");         // print temperature in degree Fahrenheit
     Serial.print(temperatureValid ? "(valid, " : "(invalid, ");                       // print measurement status
-    Serial.print("took "); Serial.print(temperatureDuration); Serial.print(" ms, ");  // print measurement duration
+    Serial.print("took "); Serial.print(temperatureDuration); Serial.print(" ms), "); // print measurement duration
 
     // take new core temperature measurement (and time it)
     long voltageDuration = millis();                                                  // take timestamp before
