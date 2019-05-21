@@ -1,4 +1,4 @@
-#include "CoreSensors.h"
+#include "CoreSensors.h"    // https://github.com/sekdiy/CoreSensors
 
 void setup() 
 { 
@@ -15,6 +15,7 @@ void loop()
   Serial.print(CoreSensor.getTemperature(true)); Serial.print(" degF, ");
   Serial.print(CoreSensor.getVoltage()); Serial.println(" V");
 
+  // wait a second
   delay(1000);
 }
 
