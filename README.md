@@ -55,3 +55,9 @@ The library is aware of different Arduino types, clock speeds and supply voltage
 Since the sensors aren't comparable with high precision external sensors, they can use some individual calibration in order to improve precision.
 
 The **CoreSensors** library provides you with a way to calibrate each individual Arduino (by taking two reference measurements and applying a simple formula, e.g. see [Albert van Dalen](http://goo.gl/Sqmzfs) and [Oregon Embedded](http://oregonembedded.com/slopeoffset.html)).
+
+## Note
+
+This library defines a dummy ADC_vect interrupt service handler routine.
+In case your code requires its own ADC_vect routine, you can simply replace the one in this library without any negative impact.
+But please keep in mind that the order of include statements in your code might influence which ADC_vect routine will actually be applied.
