@@ -34,6 +34,7 @@ void loop()
   Serial.print(CoreSensor.getTemperature(true)); Serial.print(" degF, ");
   Serial.print(CoreSensor.getVoltage()); Serial.println(" V");
 
+  // wait a second
   delay(1000);
 }
 ```
