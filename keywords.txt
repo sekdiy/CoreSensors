@@ -25,3 +25,7 @@ getVoltage	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
+
+celsius                 LITERAL1
+fahrenheit              LITERAL1
+UncalibratedCoreSensor  LITERAL1
