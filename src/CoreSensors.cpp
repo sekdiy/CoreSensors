@@ -17,10 +17,13 @@
 #include "Arduino.h"        // we're no longer compatible to IDEs < 1.0 (please raise an issue if this is too progressive)
 #include "CoreSensors.h"    // https://github.com/sekdiy/CoreSensors
 
+int const CoreSensors::celsius = 0;
+int const CoreSensors::fahrenheit = 1;
+
 /**
- * Constructor (defaults to uncalibrated).
+ * Default calibration profile, works for most devices.
  */
-CoreSensors::CoreSensors() : calibration({ 1.0f, 0.0f, 1, 1.0f, 0.0f, 1 }) {};
+CoreSensorsCalibration const CoreSensors::UncalibratedCoreSensors = { 1.0f, 0.0f, 100, 1.0f, 0.0f, 100 };
 
 /**
  * Applies a custom set of calibration parameters.

@@ -40,7 +40,12 @@ typedef struct
 class CoreSensors
 {
 public:
-  CoreSensors();
+  static int const celsius;
+  static int const fahrenheit;
+
+  static CoreSensorsCalibration const UncalibratedCoreSensors;
+
+  CoreSensors() : calibration(UncalibratedCoreSensors) {};
 
   void begin(CoreSensorsCalibration calibration);
 
