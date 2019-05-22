@@ -43,7 +43,7 @@ void loop()
 
     // output voltage measurement result (and time)
     Serial.print(CoreSensor.getVoltage(), 3); Serial.print(" V ");                              // print voltage
-    Serial.print(temperatureValid ? "(valid, " : "(invalid, ");                                 // print measurement status
+    Serial.print(voltageValid ? "(valid, " : "(invalid, ");                                     // print measurement status
     Serial.print("took "); Serial.print(voltageDuration); Serial.println(" ms)");               // print measurement duration
 
     // prepare next cycle
