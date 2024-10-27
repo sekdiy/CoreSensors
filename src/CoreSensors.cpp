@@ -28,7 +28,7 @@ CoreSensorsCalibration const CoreSensors::UncalibratedCoreSensors = { 1.0f, 0.0f
  *
  * @param CoreSensorsCalibration The calibration data for the MCU at hand.
  */
-void CoreSensors::begin(CoreSensorsCalibration calibration)
+bool CoreSensors::update()
 {
     this->calibration = calibration;
 }
@@ -56,7 +56,7 @@ bool CoreSensors::process()
  *
  * @return True if temperature sensor could be processed successfully.
  */
-bool CoreSensors::processTemperature()
+bool CoreSensors::updateTemperature()
 {
     // determine specific ADMUX settings
 #if defined(__AVR_ATmega32U4__)
@@ -111,7 +111,7 @@ bool CoreSensors::processTemperature()
  *
  * @return True if voltage sensor could be processed successfully.
  */
-bool CoreSensors::processVoltage()
+bool CoreSensors::updateVoltage()
 {
     // determine specific ADMUX settings
 #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)

@@ -49,12 +49,16 @@ public:
 
   void begin(CoreSensorsCalibration calibration);
 
-  bool process();
-  bool processTemperature();
-  bool processVoltage();
+  bool update();
+  bool updateTemperature();
+  bool updateVoltage();
 
   float getTemperature(bool fahrenheit = false);
   float getVoltage();
+  /* deprecated: */
+  bool process() { return CoreSensors::update(); }
+  bool processTemperature() { return CoreSensors::updateTemperature(); }
+  bool processVoltage() { return CoreSensors::updateVoltage(); }
 
 private:
   unsigned long accumulate(unsigned long duration);
