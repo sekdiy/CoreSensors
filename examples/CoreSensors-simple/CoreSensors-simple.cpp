@@ -19,4 +19,3 @@ void loop()
   // wait a second
   delay(1000);
 }
-

@@ -48,7 +48,7 @@ void loop()
     Serial.print("took "); Serial.print(voltageDuration); Serial.println(" ms)");               // print measurement duration
 
     // prepare next cycle
-    periodTime = millis() - currentTime;                                                        // keep timestamp of this loop
+    periodTime = currentTime;                                                                   // keep timestamp of this loop
   }
 
   // There's still time to schedule more events.
