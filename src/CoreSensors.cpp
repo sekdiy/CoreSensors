@@ -43,15 +43,8 @@ bool CoreSensors::update()
  */
 bool CoreSensors::process()
 {
-    // assume successful processing
-    bool result = true;
-
-    // make sure both sensors get processed
-    result &= this->processTemperature();
-    result &= this->processVoltage();
-
-    // fail if either sensor fails
-    return result;
+    // succeed if either sensor was updated successfully
+    return this->updateTemperature() && this->updateVoltage();
 }
 
 /**
