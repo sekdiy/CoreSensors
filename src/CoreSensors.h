@@ -78,7 +78,7 @@ private:
 };
 
 /**
- * The CoreSensor object, a singleton that gives access to the core sensors (there is only one AVR core!).
+ * The CoreSensor object, a singleton that gives access to the core sensors (there is only one set of core sensors!).
  */
 extern CoreSensors CoreSensor;
 
