@@ -1,4 +1,4 @@
-# CoreSensors Library [![Version](https://img.shields.io/badge/CoreSensors-0.2.0-blue.svg 'still in beta')](https://github.com/sekdiy/CoreSensors) [![Build Status](https://travis-ci.org/sekdiy/CoreSensors.svg?branch=master)](https://travis-ci.org/sekdiy/CoreSensors) [![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&dl=https%3A%2F%2Fgithub.com%2Fsekdiy%2FCoreSensors&cid=2238D739-76DE-4205-9768-2F3277FA2561&tid=UA-65656434-2&aip=1&dt=README)]()
+# CoreSensors Library [![Version](https://img.shields.io/badge/CoreSensors-0.3.0-blue.svg 'still in beta')](https://github.com/sekdiy/CoreSensors) [![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&dl=https%3A%2F%2Fgithub.com%2Fsekdiy%2FCoreSensors&cid=2238D739-76DE-4205-9768-2F3277FA2561&tid=UA-65656434-2&aip=1&dt=README)]()
 
 **CoreSensors** is an Arduino library that supports measuring the AVR's internal temperature and supply voltage.
 
@@ -17,17 +17,18 @@ Or your project might get hot (or cold).
 ## Example
 
 ```c++
-#include "CoreSensors.h"
+#include "Arduino.h"
+#include "CoreSensors.h"    // https://github.com/sekdiy/CoreSensors
 
-void setup()
-{
+void setup() 
+{ 
   Serial.begin(115200);
 }
 
-void loop()
-{
+void loop() 
+{ 
   // update sensor measurements
-  CoreSensor.process();
+  CoreSensor.update();
 
   // output results
   Serial.print(CoreSensor.getTemperature()); Serial.print(" degC, ");
@@ -55,7 +56,7 @@ The library is aware of different Arduino types, clock speeds and supply voltage
 
 Since the sensors aren't comparable with high precision external sensors, they can use some individual calibration in order to improve precision.
 
-The **CoreSensors** library provides you with a way to calibrate each individual Arduino (by taking two reference measurements and applying a simple formula, e.g. see [Albert van Dalen](http://goo.gl/Sqmzfs) and [Oregon Embedded](http://oregonembedded.com/slopeoffset.html)).
+The **CoreSensors** library provides you with a way to calibrate each individual Arduino (by taking two reference measurements and applying a simple formula, see [Albert van Dalen](http://goo.gl/Sqmzfs) and [Oregon Embedded](http://oregonembedded.com/slopeoffset.html) for an introduction).
 
 ## Note
 
