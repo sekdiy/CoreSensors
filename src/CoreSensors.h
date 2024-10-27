@@ -54,7 +54,8 @@ public:
   bool updateVoltage();
 
   float getTemperature(bool fahrenheit = false);
-  float getVoltage();
+  float getVoltage(bool millivolt = false);
+
   /* deprecated: */
   bool process() { return CoreSensors::update(); }
   bool processTemperature() { return CoreSensors::updateTemperature(); }

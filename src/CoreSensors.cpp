@@ -167,11 +167,11 @@ float CoreSensors::getTemperature(bool fahrenheit)
 }
 
 /*
- * @return The voltage (in Volt).
+ * @return The voltage (in Volt or Millivolt).
  */
-float CoreSensors::getVoltage()
+float CoreSensors::getVoltage(bool millivolt)
 {
-    return (float) this->voltage;
+    return (float) (millivolt ? this->voltage * 1000.0f : this->voltage);
 }
 
 /**
