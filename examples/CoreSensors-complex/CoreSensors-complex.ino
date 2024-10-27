@@ -2,6 +2,7 @@
  * This example is intended for evaluating timing requirements and refining calibration profiles.
  */
 
+#include "Arduino.h"
 #include "CoreSensors.h"                                                                        // https://github.com/sekdiy/CoreSensors
 
 const long periodDuration = 1000;                                                               // we're setting up a schedule (i.e. every 1000ms)
@@ -27,7 +28,7 @@ void loop()
 
     // take new core temperature measurement (and time it)
     long temperatureDuration = millis();                                                        // take timestamp before
-    bool temperatureValid = CoreSensor.processTemperature();                                    // take temperature measurement
+    bool temperatureValid = CoreSensor.updateTemperature();                                     // take temperature measurement
     temperatureDuration = millis() - temperatureDuration;                                       // take timestamp after
 
     // output temperature measurement result (and time)
@@ -38,7 +39,7 @@ void loop()
 
     // take new core temperature measurement (and time it)
     long voltageDuration = millis();                                                            // take timestamp before
-    bool voltageValid = CoreSensor.processVoltage();                                            // take voltage measurement
+    bool voltageValid = CoreSensor.updateVoltage();                                             // take voltage measurement
     voltageDuration = millis() - voltageDuration;                                               // take timestamp after
 
     // output voltage measurement result (and time)
@@ -47,7 +48,7 @@ void loop()
     Serial.print("took "); Serial.print(voltageDuration); Serial.println(" ms)");               // print measurement duration
 
     // prepare next cycle
-    periodTime = currentTime;                                                                   // keep timestamp of this loop
+    periodTime = millis() - currentTime;                                                        // keep timestamp of this loop
   }
 
   // There's still time to schedule more events.

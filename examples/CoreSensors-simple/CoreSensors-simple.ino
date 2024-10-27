@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "CoreSensors.h"    // https://github.com/sekdiy/CoreSensors
 
 void setup() 
@@ -8,7 +9,7 @@ void setup()
 void loop() 
 { 
   // update sensor measurements
-  CoreSensor.process();
+  CoreSensor.update();
 
   // output results
   Serial.print(CoreSensor.getTemperature()); Serial.print(" degC, ");
