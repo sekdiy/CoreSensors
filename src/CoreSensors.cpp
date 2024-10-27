@@ -21,7 +21,10 @@ int const CoreSensors::fahrenheit = 1;
 /**
  * Default calibration profile, works for most devices.
  */
-CoreSensorsCalibration const CoreSensors::UncalibratedCoreSensors = { 1.0f, 0.0f, 100, 1.0f, 0.0f, 100 };
+CoreSensorsCalibration const UncalibratedCoreSensors = { 1.0f, 0.0f, 100, 1.0f, 0.0f, 100 };
+CoreSensorsCalibration const DuemilanoveCoreSensorsCalibration = { 1.1786564159f, 48.8f, 1000, 1.0261748959f, 0.0f, 1000 };
+CoreSensorsCalibration const ProMiniCoreSensorsCalibration = { 1.22f, -6.85f, 1000, 1.0192115269f, 0.0f, 1000 };
+CoreSensorsCalibration const ProMicroCoreSensorsCalibration = { 1.0f, 4.5f, 1000, 1.0192115269f, 0.0f, 1000 };
 
 /**
  * Applies a custom set of calibration parameters.

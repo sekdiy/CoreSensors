@@ -13,16 +13,17 @@
 #define CoreSensors_H
 
 /**
- * The CoreSensorsCalibration structure stores calibration information for temperature and voltage compensation.
- *
- * Arduino Pro Mini:    { 1.22f, 64.85f, 1000, 1.0192115269f, 0.0f, 1000 }
- * Arduino Duemilanove: { 1.1786564159f, 48.8f, 1000, 1.0261748959f, 0.0f, 1000 }
+ * CoreSensorsCalibration stores calibration information for temperature and voltage compensation.
  *
  * @see e.g. https://www.avdweb.nl/arduino/measurement/temperature-measurement#h10-calibration
  * @todo create tutorial on calibration
+ * @see AVR120: "Characterization and Calibration of the ADC on an AVR"
+ * @see AVR122: "Calibration of the AVR's Internal Temperature Reference"
+ * @see AVR126: "ADC of megaAVR® in Single-Ended Mode"
  */
-typedef struct
+class CoreSensorsCalibration
 {
+public:
   // temperature
   float gainT;          // over intended range
   float offsetT;        // at 0 degree Celsius
@@ -32,7 +33,15 @@ typedef struct
   float gainV;          // over intended range
   float offsetV;        // at nominal supply voltage
   long  lengthV;        // number of samples for averaging
-} CoreSensorsCalibration;
+};
+
+/**
+ * Pre-defined core sensor calibration datasets.
+ */
+extern CoreSensorsCalibration const UncalibratedCoreSensors;
+extern CoreSensorsCalibration const DuemilanoveCoreSensorsCalibration;
+extern CoreSensorsCalibration const ProMiniCoreSensorsCalibration;
+extern CoreSensorsCalibration const ProMicroCoreSensorsCalibration;
 
 /**
  * The CoreSensors class.
@@ -43,11 +52,8 @@ public:
   static int const celsius;
   static int const fahrenheit;
 
-  static CoreSensorsCalibration const UncalibratedCoreSensors;
-
-  CoreSensors() : calibration(UncalibratedCoreSensors) {};
-
-  void begin(CoreSensorsCalibration calibration);
+  CoreSensors(CoreSensorsCalibration cal = UncalibratedCoreSensors) : calibration(cal) {};
+  void begin(CoreSensorsCalibration cal = UncalibratedCoreSensors) { this->calibration = cal; };
 
   bool update();
   bool updateTemperature();
