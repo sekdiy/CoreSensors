@@ -87,7 +87,7 @@ bool CoreSensors::updateTemperature()
     ADCSRB = CoreSensors_Temperature_ADCSRB;
     sei();                                  // enable interrupts
 
-    delay(20);                              // wait for the reference to stabilize
+    delay(1);                              // wait for the reference to stabilize
 
     // sample, average, calculate and store compensated temperature
     this->temperature = (float) ((this->accumulate(this->calibration.lengthT) / float(this->calibration.lengthT) - 273.15f - CoreSensors_Temperature_Offset - this->calibration.offsetT) / (1.22f * this->calibration.gainT));
@@ -139,7 +139,7 @@ bool CoreSensors::updateVoltage()
     sei();                                  // enable interrupts
 
     // wait for the reference to stabilize
-    delay(70);  // see atmel.com/Images/doc8444.pdf on page 9
+    delay(1);                               // wait for the reference to stabilize
 
     // store voltage: ADC = (Vref * 1024) / Vcc <=> Vcc = (Vref * 1024) / ADC
     this->voltage = (float) (((1.1f - this->calibration.offsetV) * 1024.0f / this->calibration.gainV) / (this->accumulate(this->calibration.lengthV) / float(this->calibration.lengthV)));
