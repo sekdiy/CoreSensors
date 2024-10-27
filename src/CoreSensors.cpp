@@ -5,7 +5,7 @@
  *
  * @author sekdiy (https://github.com/sekdiy/CoreSensors)
  * @date 08.03.2016
- * @version See git comments for changes.
+ * @version See git commit comments for changes.
  * @see http://playground.arduino.cc/Main/InternalTemperatureSensor
  *
  * @todo consider refactoring to Millivolt and Millikelvin in order to get rid of floating point arithmetic
@@ -27,21 +27,11 @@ CoreSensorsCalibration const ProMiniCoreSensorsCalibration = { 1.22f, -6.85f, 10
 CoreSensorsCalibration const ProMicroCoreSensorsCalibration = { 1.0f, 4.5f, 1000, 1.0192115269f, 0.0f, 1000 };
 
 /**
- * Applies a custom set of calibration parameters.
+ * Update both temperature and voltage measurements and store results.
  *
- * @param CoreSensorsCalibration The calibration data for the MCU at hand.
+ * @return True if either sensor could be updated successfully.
  */
 bool CoreSensors::update()
-{
-    this->calibration = calibration;
-}
-
-/**
- * Process both temperature and voltage measurements and store results.
- *
- * @return True if either sensor could be processed successfully.
- */
-bool CoreSensors::process()
 {
     // succeed if either sensor was updated successfully
     return this->updateTemperature() && this->updateVoltage();
@@ -254,6 +244,6 @@ ISR(ADC_vect)
 }
 
 /**
- * The CoreSensor object, a singleton that gives access to the core sensors (there is only one AVR core!).
+ * The CoreSensor object, a singleton that gives access to the core sensors (there is only one set of core sensors!).
  */
 CoreSensors CoreSensor;

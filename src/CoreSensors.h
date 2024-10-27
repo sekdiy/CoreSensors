@@ -9,8 +9,8 @@
  * @see http://playground.arduino.cc/Main/InternalTemperatureSensor
  */
 
-#ifndef CoreSensors_H
-#define CoreSensors_H
+#ifndef __CORESENSORS_H__
+#define __CORESENSORS_H__
 
 /**
  * CoreSensorsCalibration stores calibration information for temperature and voltage compensation.
@@ -82,4 +82,4 @@ private:
  */
 extern CoreSensors CoreSensor;
 
-#endif
+#endif  // __CORESENSORS_H__
