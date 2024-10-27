@@ -1,0 +1,35 @@
+{
+    "name": "CoreSensors",
+    "version": "0.3.0",
+    "description": "An interface to the Arduino's internal temperature (diode reference) and supply voltage (bandgap reference). Tested with ATmega328P and ATmega32U4.",
+    "keywords": "Sensors, Temperature, Voltage",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/sekdiy/CoreSensors.git"
+    },
+    "authors":
+    [
+      {
+        "name": "sekdiy",
+        "email": "sek@sekdiy.de"
+      }
+    ],
+    "examples": 
+    [
+        {
+            "name": "CoreSensors-simple",
+            "base": "examples/CoreSensors-simple",
+            "files": "CoreSensors-simple.cpp"
+        },
+        {
+            "name": "CoreSensors-complex",
+            "base": "examples/CoreSensors-complex",
+            "files": "CoreSensors-complex.cpp"
+        }
+    ],
+    "license": "MIT",
+    "frameworks": "arduino",
+    "platforms": "*"
+  }
+  

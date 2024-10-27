@@ -2,6 +2,7 @@
  * CoreSensors.cpp
  *
  * An interface to the Arduino's internal temperature (diode reference) and supply voltage (bandgap reference).
+ * Tested with ATmega328P and ATmega32U4.
  *
  * @author sekdiy (https://github.com/sekdiy/CoreSensors)
  * @date 08.03.2016
