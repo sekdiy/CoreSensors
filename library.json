@@ -12,7 +12,8 @@
     [
       {
         "name": "sekdiy",
-        "email": "sek@sekdiy.de"
+        "email": "sek@sekdiy.de",
+        "maintainer": true
       }
     ],
     "examples": 
@@ -20,12 +21,12 @@
         {
             "name": "CoreSensors-simple",
             "base": "examples/CoreSensors-simple",
-            "files": "CoreSensors-simple.cpp"
+            "files": ["CoreSensors-simple.cpp"]
         },
         {
             "name": "CoreSensors-complex",
             "base": "examples/CoreSensors-complex",
-            "files": "CoreSensors-complex.cpp"
+            "files": ["CoreSensors-complex.cpp"]
         }
     ],
     "license": "MIT",
